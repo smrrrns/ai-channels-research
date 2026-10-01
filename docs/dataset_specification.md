@@ -3,8 +3,7 @@
 Итоговый файл: [`data/final/ai_publics_dataset.csv`](../data/final/ai_publics_dataset.csv).
 10 479 постов из 10 Telegram-каналов, 83 признака, период декабрь 2024 — декабрь 2025.
 
-Сводная статистика: [`dataset_statistics.csv`](dataset_statistics.csv), [`analysis_report.csv`](analysis_report.csv).
-Полная таблица признаков по группам (сгенерирована `notebooks/refactor.ipynb`): [`dataset_structure.txt`](dataset_structure.txt) / [`dataset_structure.png`](dataset_structure.png).
+Полная таблица признаков по группам (сгенерирована `notebooks/refactor.ipynb`): [`dataset_structure.txt`](dataset_structure.txt).
 
 ## Единица наблюдения
 
@@ -59,7 +58,5 @@
 4. **`notebooks/analysis.ipynb`** — итоговый анализ и графики (`notebooks/figures/`).
 
 ## Известные ограничения
-
-- Пайплайн очистки в `01_data_cleaning.ipynb` местами не полностью детерминирован (несколько экспериментальных ячеек сохраняют промежуточные варианты датасета под разными именами) — воспроизводимость сборки `data/final/` не гарантирована 1-в-1 при повторном запуске.
 - `is_scheduled` — эвристика по времени публикации, а не факт из API.
 - Полнота реакций зависит от `CUSTOM_REACTIONS_MAP`: реакция, для которой нет записи в карте, попадёт в колонку `reaction_custom_<id>` вместо человекочитаемого эмодзи.

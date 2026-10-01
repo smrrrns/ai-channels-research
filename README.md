@@ -26,7 +26,7 @@
 | `Education_Yandex` | Яндекс Образование | 36 000 | 365 |
 | `tbank_education` | Т-Образование | 115 068 | 313 |
 
-Период: декабрь 2024 — декабрь 2025 (~364 дня). Подробная статистика — в [`docs/dataset_statistics.csv`](docs/dataset_statistics.csv) и [`docs/analysis_report.csv`](docs/analysis_report.csv).
+Период: декабрь 2024 — декабрь 2025 (~364 дня). Подробная статистика — в [`docs/dataset_specification.md`](docs/dataset_specification.md).
 
 ## Структура проекта
 
