@@ -1,24 +1,21 @@
 import logging
 from telethon import TelegramClient
 from telethon.errors import (
-    SessionPasswordNeededError, PhoneNumberInvalidError, 
+    SessionPasswordNeededError, PhoneNumberInvalidError,
     ApiIdInvalidError, FloodWaitError
 )
 
 class TelegramClientManager:
-    """
-    Менеджер клиента Telegram для управления подключением
-    """
-    
+    """Контекстный менеджер для подключения к Telegram"""
+
     def __init__(self, api_id: int, api_hash: str, session_name: str = 'ai_research'):
         self.api_id = api_id
         self.api_hash = api_hash
         self.session_name = session_name
         self.client = None
         self.logger = self._setup_logging()
-        
+
     def _setup_logging(self):
-        """Настройка логирования"""
         logger = logging.getLogger('TelegramClient')
         if not logger.handlers:
             handler = logging.StreamHandler()
@@ -38,28 +35,26 @@ class TelegramClientManager:
         await self.disconnect()
 
     async def connect(self):
-        """Подключение к Telegram"""
         try:
-            self.logger.info(f"🔗 Подключаемся к Telegram (сессия: {self.session_name})...")
+            self.logger.info(f"Подключаемся к Telegram, сессия {self.session_name}")
             self.client = TelegramClient(
-                self.session_name, 
-                self.api_id, 
+                self.session_name,
+                self.api_id,
                 self.api_hash
             )
-            
+
             await self.client.start()
             me = await self.client.get_me()
-            self.logger.info(f"✅ Успешный вход как: {me.first_name}")
-            
+            self.logger.info(f"Успешный вход как: {me.first_name}")
+
         except (ApiIdInvalidError, PhoneNumberInvalidError, SessionPasswordNeededError) as e:
-            self.logger.error(f"❌ Ошибка аутентификации: {e}")
+            self.logger.error(f"Ошибка аутентификации: {e}")
             raise
         except Exception as e:
-            self.logger.error(f"❌ Ошибка подключения: {e}")
+            self.logger.error(f"Ошибка подключения: {e}")
             raise
 
     async def disconnect(self):
-        """Отключение от Telegram"""
         if self.client and self.client.is_connected():
             await self.client.disconnect()
-            self.logger.info("🔌 Отключились от Telegram")
+            self.logger.info("Отключились от Telegram")

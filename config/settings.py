@@ -5,33 +5,30 @@ from src.utils.validators import ConfigValidator
 load_dotenv()
 
 class Config:
-    """Конфигурация с полноценной валидацией"""
-    
-    # Обязательные параметры
+    """Настройки из .env"""
+
     API_ID = os.getenv('API_ID')
     API_HASH = os.getenv('API_HASH')
-    
-    # Основные настройки с дефолтами
+
     SESSION_NAME = os.getenv('SESSION_NAME')
     DEFAULT_POSTS_LIMIT = int(os.getenv('DEFAULT_POSTS_LIMIT'))
     REQUEST_DELAY = int(os.getenv('REQUEST_DELAY'))
     MAX_RETRIES = int(os.getenv('MAX_RETRIES'))
     LOG_LEVEL = os.getenv('LOG_LEVEL')
-    
-    # Целевые каналы
+
     TARGET_CHANNELS = []
     for i in range(1, 11):
         channel = os.getenv(f'CHANNEL_{i}')
         if channel and channel.strip():
             TARGET_CHANNELS.append(channel.strip())
-    
+
     CUSTOM_REACTIONS_MAP = {
         'global': {},
         'by_channel': {
             'ict_moscow_ai': {
-                '5217962652742996135': '❤️', # лампа 
+                '5217962652742996135': '❤️', # лампа
                 '5289509472090220232': '❤️', # ICT
-                '5445042860787252192': '❤️', # ICT 
+                '5445042860787252192': '❤️', # ICT
 
             },
             'd_code': {
@@ -48,7 +45,7 @@ class Config:
                 '5435931719028997627': '🩷',
                 '5368748388885999718': '🩷', # top
                 '4960832663062578456': '🩷', # сердечко
-                '5307602562990492983': '🔥', 
+                '5307602562990492983': '🔥',
                 '5472411062412254753': '🧑‍🎓',
                 '5435968389459767071': '🔥',
                 '5436383132976702162': '⭐',
@@ -69,11 +66,11 @@ class Config:
                 '5248951709367017473': '🚫', # парень перечеркнут красным крестом
             },
             'spbuniversity1724': {
-                '5422748398518301870': '❤️', # спбгу 
-                '5420436396148027032': '❤️', # сердечко 
+                '5422748398518301870': '❤️', # спбгу
+                '5420436396148027032': '❤️', # сердечко
                 '5411468637577965032': '❤️', # спбгу
-                '5307926626862909975': '❤️', # вау! 
-                '5388584785536904914': '❤️', 
+                '5307926626862909975': '❤️', # вау!
+                '5388584785536904914': '❤️',
                 '5388802501724092155': '❤️', # флаг россии
             },
             'naebnet': {
@@ -81,28 +78,22 @@ class Config:
             }
         }
     }
-    
+
     @classmethod
     def get_reaction_name(cls, channel_username, reaction_id):
-        """
-        Получение человеко-читаемого имени для реакции
-        Приоритет: канал -> глобальные -> ID
-        """
-        # Пробуем найти в специфичных для канала
+        """Имя реакции: сначала по каналу, потом глобальное, иначе unknown"""
         channel_map = cls.CUSTOM_REACTIONS_MAP['by_channel'].get(channel_username, {})
         if reaction_id in channel_map:
             return channel_map[reaction_id]
-        
-        # Пробуем найти в глобальных
+
         if reaction_id in cls.CUSTOM_REACTIONS_MAP['global']:
             return cls.CUSTOM_REACTIONS_MAP['global'][reaction_id]
-        
-        # Возвращаем ID если не нашли
+
         return f"unknown_{reaction_id}"
-    
+
     @classmethod
     def get_all_known_reactions(cls):
-        """Получить все известные реакции для анализа"""
+        """Все известные реакции из карты"""
         all_reactions = set(cls.CUSTOM_REACTIONS_MAP['global'].values())
         for channel_map in cls.CUSTOM_REACTIONS_MAP['by_channel'].values():
             all_reactions.update(channel_map.values())
@@ -110,67 +101,55 @@ class Config:
 
     @classmethod
     def validate(cls):
-        """Проверка корректности конфигурации"""
         errors = []
-        
-        # Проверка обязательных параметров
+
         if not cls.API_ID:
             errors.append("API_ID не найден в .env файле")
         elif not cls.API_ID.isdigit():
             errors.append("API_ID должен быть числом")
-        
+
         if not cls.API_HASH:
             errors.append("API_HASH не найден в .env файле")
         elif len(cls.API_HASH) != 32:
             errors.append("API_HASH должен содержать 32 символа")
-        
-        # Проверка целевых каналов
+
         if not cls.TARGET_CHANNELS:
             errors.append("Не указаны целевые каналы (CHANNEL_1, CHANNEL_2, ...)")
-        
-        # Проверка числовых параметров
+
         if cls.DEFAULT_POSTS_LIMIT <= 0:
             errors.append("DEFAULT_POSTS_LIMIT должен быть положительным числом")
-        
+
         if cls.REQUEST_DELAY < 0:
             errors.append("REQUEST_DELAY не может быть отрицательным")
-        
+
         return errors
-    
+
     @classmethod
     def print_summary(cls):
-        """Печать сводки конфигурации"""
-        print("📋 СВОДКА КОНФИГУРАЦИИ:")
-        print(f"   API_ID: {cls.API_ID}")
-        print(f"   API_HASH: {cls.API_HASH[:8]}..." if cls.API_HASH else "   API_HASH: не указан")
-        print(f"   SESSION_NAME: {cls.SESSION_NAME}")
-        print(f"   КАНАЛОВ: {len(cls.TARGET_CHANNELS)}")
+        print("Сводка конфигурации:")
+        print(f"   Каналов: {len(cls.TARGET_CHANNELS)}")
         for i, channel in enumerate(cls.TARGET_CHANNELS, 1):
             print(f"     {i}. @{channel}")
-        print(f"   ЛИМИТ ПОСТОВ: {cls.DEFAULT_POSTS_LIMIT}")
-        print(f"   ЗАДЕРЖКА: {cls.REQUEST_DELAY} сек")
+        print(f"   Лимит постов: {cls.DEFAULT_POSTS_LIMIT}")
+        print(f"   Задержка: {cls.REQUEST_DELAY} сек")
 
-# 🔍 АВТОМАТИЧЕСКАЯ ВАЛИДАЦИЯ ПРИ ЗАГРУЗКЕ
+# конфиг проверяется при импорте
 def initialize_config():
-    """Инициализация и валидация конфигурации"""
     errors = Config.validate()
-    
+
     if errors:
-        print("ОШИБКИ КОНФИГУРАЦИИ:")
+        print("Ошибки конфигурации:")
         for error in errors:
             print(f"   {error}")
-        print("\n💡 Решение: проверьте файл .env в корне проекта")
+        print("Проверьте файл .env в корне проекта")
         return False
     else:
-        print("КОНФИГУРАЦИЯ ЗАГРУЖЕНА УСПЕШНО!")
         Config.print_summary()
-        
-        # Преобразование API_ID в число после валидации
+
         if Config.API_ID and Config.API_ID.isdigit():
             Config.API_ID = int(Config.API_ID)
-        
+
         return True
 
-# Запускаем инициализацию
 config = Config()
 is_config_valid = initialize_config()
